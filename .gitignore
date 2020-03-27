@@ -1,1 +1,6 @@
 node_modules/
+
+/config/master.key
+.env
+.env.dev
+

@@ -1,5 +1,6 @@
 // initialize express router
 let router = require('express').Router()
+const { checkAuthHeader } = require('./middleware/checks')
 
 // set default API response
 router.get('/', (request, response) => {
@@ -9,11 +10,11 @@ router.get('/', (request, response) => {
     })
 })
 
-let userController = require('./controllers/userController')
-let batchController = require('./controllers/batchController')
+const userController = require('./controllers/userController')
+const batchController = require('./controllers/batchController')
 
 router.route('/users')
-    .get(userController.index)
+    .get(checkAuthHeader, userController.index)
     .post(userController.new)
 
 router.route('/users/:user_id')

@@ -1,4 +1,4 @@
-const Batch = require('../models/batchModel')
+const Batch = require('../models/Batch')
 
 // all batches index read
 exports.index = (request, response) => {

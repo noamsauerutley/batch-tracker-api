@@ -1,8 +1,9 @@
-const User = require('../models/userModel')
+const User = require('../models/User')
+import {makeToken} from '../utils/tokenManager'
 
 // all users index read
 exports.index = (request, response) => {
-    User.get( (error, users) => {
+    User.find({}, (error, users) => {
         if(error){
             response.json({
                 status: "error",
@@ -18,20 +19,19 @@ exports.index = (request, response) => {
 }
 
 // user create
-exports.new = (request, response) => {
-    let user = new User()
-    user.username = request.body.username ? request.body.username: user.username
-    user.email = request.body.email
+exports.new = async (request, response) => {
+    const {username, password } = request.body
 
-    user.save( (error) => {
-        if (error){
-            response.json(error)
-        }
-        response.json({
-            message: "Success: New user created!",
-            data: user
-        })
-    })
+    if (!username || !password) throw new Error('username and password required')
+
+    const user = new User({ username, password})
+
+    await user.save()
+
+    const token = makeToken(user)
+
+    response.status(201).json({token})
+   
 }
 
 // user view read

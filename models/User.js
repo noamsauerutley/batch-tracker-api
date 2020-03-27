@@ -1,13 +1,16 @@
-let mongoose = require('mongoose')
-
-let userSchema = mongoose.Schema({
+const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
+import { parseToken } from '../utils/tokenManager'
+const UserSchema = new mongoose.Schema({
     username: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
-    email: {
+    password: {
         type: String,
-        required: true
+        required: true,
+        select: false
     },
     create_date: {
         type: Date,
@@ -15,8 +18,27 @@ let userSchema = mongoose.Schema({
     }
 })
 
-let User = module.exports = mongoose.model('user', userSchema)
+UserSchema.pre('save', async function hashPassword(next){
+    try {
+      if (!this.isModified('password')) return next()
+      
+      const hashedPassword = await bcrypt.hash(this.password, 10)
+      this.password = hashedPassword
+    } catch (error) {
+        next(error)
+    }
+}) 
 
-module.exports.get = (callback, limit) => {
-    User.find(callback).limit(limit)
-}
+UserSchema.methods.isCorrectPassword = async function(password) {
+  const isCorrect = await bcrypt.compare(password, this.password)
+  return isCorrect
+  }
+
+  UserSchema.statics.fromToken = async function fromToken(token){
+      const { userId } = parseToken(token)
+      const user = await this.findById(userId)
+      return user
+  }
+
+
+module.exports = mongoose.model('User', UserSchema)
