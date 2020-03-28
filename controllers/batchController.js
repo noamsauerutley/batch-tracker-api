@@ -3,18 +3,18 @@ const Batch = require('../models/Batch')
 // all batches index read
 exports.index = (request, response) => {
     Batch.get( (error, batches) => {
-        if(error){
-            response.json({
-                status: "error",
-                message: error,
-            })
-        }
-        response.json({
-            status: "success",
-            message: "Success: Batches retrieved",
-            data: batches
-        })
-    })
+            if(error){
+                    response.json({
+                            status: "error",
+                            message: error,
+                        })
+                    }
+                    response.json({
+                            status: "success",
+                            message: "Success: Batches retrieved",
+                            data: batches
+                        })
+                    })
 }
 
 // batch create

@@ -1,22 +1,40 @@
+import { body, validationResult } from 'express-validator';
 const User = require('../models/User')
 import {makeToken} from '../utils/tokenManager'
 
-// all users index read
-exports.index = (request, response) => {
-    User.find({}, (error, users) => {
-        if(error){
-            response.json({
-                status: "error",
-                message: error,
-            })
-        }
-        response.json({
-            status: "success",
-            message: "Success: Users retrieved",
-            data: users
-        })
-    })
+export const validateSignupFunctions = [
+	body('username'),
+	body('username').notEmpty().withMessage('Username cannot be blank.'),
+	body('password').notEmpty().withMessage('Password cannot be blank.'),
+	body('confirmPassword').exists().custom((value, { req }) => value === req.body.password),
+]
+
+
+export const handleValidationErrors = (req, res, next) => {
+	const errors = validationResult(req)
+	if (!errors.isEmpty()) {
+		res.status(400).json({ errors })
+		return // stop the fn from running
+	}
+	next()
 }
+
+// // all users index read
+// exports.index = async (request, response) => {
+//     User.find({}, (error, users) => {
+//         if(error){
+//             response.json({
+//                 status: "error",
+//                 message: error,
+//             })
+//         }
+//         response.json({
+//             status: "success",
+//             message: "Success: Users retrieved",
+//             data: users
+//         })
+//     })
+// }
 
 // user create
 exports.new = async (request, response) => {

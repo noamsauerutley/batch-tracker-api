@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 import { parseToken } from '../utils/tokenManager'
+
 const UserSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -29,9 +30,9 @@ UserSchema.pre('save', async function hashPassword(next){
     }
 }) 
 
-UserSchema.methods.isCorrectPassword = async function(password) {
-  const isCorrect = await bcrypt.compare(password, this.password)
-  return isCorrect
+UserSchema.methods.authenticate = async function(password) {
+  const isAuthenticated = await bcrypt.compare(password, this.password)
+  return isAuthenticated
   }
 
   UserSchema.statics.fromToken = async function fromToken(token){
